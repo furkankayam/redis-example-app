@@ -19,7 +19,7 @@
 
 <details>
 <summary>🌐 Open API</summary>
-<img src="./images/interest-rates.png" alt="open-api">
+<img src="./images/open-api.png" alt="open-api">
 </details>
 
 <details>
