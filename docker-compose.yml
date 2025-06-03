@@ -1,0 +1,71 @@
+# Services
+services:
+  # Frontend
+  frontend_app:
+    build: ./redis-example-frontend/.
+    container_name: frontend
+    restart: always
+    env_file: ./.env
+    ports:
+      - "${FRONTEND_PORT}:80"
+    networks:
+      - my-network
+
+  # Backend
+  backend_app:
+    build: ./redis-example-backend/.
+    container_name: backend_app
+    restart: always
+    env_file: ./.env
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_USERNAME: ${REDIS_USERNAME}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - "${BACKEND_PORT}:8080"
+    depends_on:
+      - redis
+    networks:
+      - my-network
+
+  # Redis
+  redis:
+    image: redis:8.0
+    container_name: redis
+    restart: always
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    env_file: ./.env
+    environment:
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - redis-example-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - my-network
+
+  # Redis Insight
+  redis-insight:
+    image: redis/redisinsight:2.70
+    container_name: redis-insight
+    restart: always
+    env_file: ./.env
+    ports:
+      - ${REDIS_INSIGHT_PORT}:5540
+    volumes:
+      - redis-insight:/data
+    networks:
+      - my-network
+
+# Volumes
+volumes:
+  redis-insight:
+  redis-example-data:
+
+# Networks
+networks:
+  my-network:
+    driver: bridge
